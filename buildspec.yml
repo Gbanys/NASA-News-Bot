@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 10 # Example runtime (you can specify the version of your environment, e.g., python, nodejs, etc.)
+      python: 3.11.10
     commands:
       - echo Installing dependencies...
       - pip install pandas
