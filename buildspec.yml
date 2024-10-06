@@ -24,12 +24,6 @@ phases:
       #- aws s3 cp ./build s3://your-s3-bucket-name --recursive # Example: Upload build artifacts to S3.
       - echo Deploying or running any additional scripts...
 
-artifacts:
-  files:
-    - '**/*' # Example: Include all files in the build output directory.
-  base-directory: nasa-pipeline # Example: Specify the base directory where your build output resides.
-  discard-paths: yes # Example: Discard the folder structure when copying files.
-
 env:
   variables:
     ENVIRONMENT: "dev" # Example environment variable. Add more as needed.
