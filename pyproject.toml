@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "nasa-news-bot"
+version = "0.1.0"
+description = ""
+authors = ["gbanys <giedriusbanys150@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.2.3"
+jupyter = "^1.1.1"
+requests = "^2.32.3"
+beautifulsoup4 = "^4.12.3"
+selenium = "^4.25.0"
+webdriver-manager = "^4.0.2"
+langchain = "^0.3.2"
+langchain-community = "^0.3.1"
+langchain-openai = "^0.2.2"
+langchain-chroma = "^0.1.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
