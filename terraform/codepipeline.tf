@@ -84,18 +84,6 @@ resource "aws_codepipeline" "codepipeline" {
   }
 }
 
-resource "aws_codepipeline_webhook" "github_webhook" {
-  name            = "github-webhook"
-  target_action   = "Source"
-  target_pipeline = aws_codepipeline.codepipeline.name
-  authentication  = "UNAUTHENTICATED"
-
-  filter {
-    json_path   = "$.ref"
-    match_equals = "refs/heads/master"  # Triggers on pushes to the master branch
-  }
-}
-
 resource "aws_codestarconnections_connection" "nasa_repository_connection" {
   name          = "nasa-repository-connection"
   provider_type = "GitHub"
