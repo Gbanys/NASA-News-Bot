@@ -120,6 +120,7 @@ resource "aws_iam_role" "nasa_codepipeline_role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
+
 data "aws_iam_policy_document" "kms_policy" {
   statement {
     effect = "Allow"
