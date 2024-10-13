@@ -45,6 +45,20 @@ resource "aws_codepipeline" "codepipeline" {
   }
 
   stage {
+    name = "Approve"
+    action {
+        name     = "Approval"
+        category = "Approval"
+        owner    = "AWS"
+        provider = "Manual"
+        version  = "1"
+        configuration = {
+            CustomData      = "Please review and approve."
+      }
+    }
+  }
+
+  stage {
     name = "Build"
 
     action {
@@ -61,33 +75,28 @@ resource "aws_codepipeline" "codepipeline" {
       }
     }
   }
-
-  stage {
-    name = "Deploy"
-
-    action {
-      name            = "Deploy"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "CloudFormation"
-      input_artifacts = ["build_output"]
-      version         = "1"
-
-      configuration = {
-        ActionMode     = "REPLACE_ON_FAILURE"
-        Capabilities   = "CAPABILITY_AUTO_EXPAND,CAPABILITY_IAM"
-        OutputFileName = "CreateStackOutput.json"
-        StackName      = "MyStack"
-        TemplatePath   = "build_output::sam-templated.yaml"
-      }
-    }
-  }
 }
 
 resource "aws_codestarconnections_connection" "nasa_repository_connection" {
   name          = "nasa-repository-connection"
   provider_type = "GitHub"
 }
+
+
+resource "aws_codestarnotifications_notification_rule" "manual_approval_notification_rule" {
+  name      = "manual-approval-notification"
+  detail_type = "FULL"
+  resource = aws_codepipeline.codepipeline.arn
+
+  event_type_ids = [
+    "codepipeline-pipeline-manual-approval-needed"
+  ]
+
+  target {
+    address = aws_sns_topic.admin-sns-topic.arn
+  }
+}
+
 
 resource "aws_s3_bucket" "nasa_codepipeline_bucket" {
   bucket = "nasa-codepipeline-bucket"
