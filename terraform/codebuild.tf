@@ -47,6 +47,11 @@ resource "aws_iam_role" "nasa_codebuild_service_role" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "ecr_full_access_attachment" {
+  role       = aws_iam_role.nasa_codebuild_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+}
+
 resource "aws_iam_role_policy_attachment" "nasa_codebuild_assume_policy" {
   role       = aws_iam_role.nasa_codebuild_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
@@ -75,19 +80,6 @@ data "aws_iam_policy_document" "codebuild_policy" {
       "kms:Decrypt"
     ]
     resources=[aws_kms_key.nasa_s3_kms_key.arn]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "ecr:GetAuthorizationToken",
-      "ecr:DescribeRepositories",
-      "ecr:ListImages",
-      "ecr:PutImage",
-      "ecr:InitiateLayerUpload",
-      "ecr:UploadLayerPart",
-      "ecr:CompleteLayerUpload",
-    ]
-    resources=["*"]
   }
 }
 
