@@ -5,6 +5,8 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
@@ -13,7 +15,7 @@ async def root(request: Request):
         request=request, 
         name="home.html",
         context={
-            "websocket_url" : "localhost"
+            "websocket_url" : "ws://127.0.0.1:5000/websocket"
         }
     )
 

@@ -5,26 +5,21 @@ phases:
     runtime-versions:
       python: 3.11.10
     commands:
-      - echo Installing dependencies...
-      - pip install pandas
+      - echo "Installing dependencies..."
+      - apt-get update
+      - apt-get install -y make docker-compose docker.io
   
   pre_build:
     commands:
-      - echo Running pre-build commands...
-      #TESTING
+      - aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 257743355435.dkr.ecr.eu-west-2.amazonaws.com
 
   build:
     commands:
-      - echo Building the project...
+      - make build
 
   post_build:
     commands:
-      - echo Build completed.
-      #- echo Running post-build commands...
-      #- aws s3 cp ./build s3://your-s3-bucket-name --recursive # Example: Upload build artifacts to S3.
-      - echo Deploying or running any additional scripts...
-
-env:
-  variables:
-    ENVIRONMENT: "dev" # Example environment variable. Add more as needed.
-    S3_BUCKET: "your-s3-bucket-name"
+      - docker tag nasa-news-bot_frontend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
+      - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
+      - docker tag nasa-news-bot_backend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
+      - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest

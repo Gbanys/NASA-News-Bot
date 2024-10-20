@@ -20,7 +20,7 @@ resource "aws_codebuild_project" "nasa_codebuild_project" {
     }
   }
 
-  service_role = aws_iam_role.nasa_codebuild_role.arn
+  service_role = aws_iam_role.nasa_codebuild_service_role.arn
 
   artifacts {
     type = "S3"
@@ -31,8 +31,8 @@ resource "aws_codebuild_project" "nasa_codebuild_project" {
   }
 }
 
-resource "aws_iam_role" "nasa_codebuild_role" {
-  name = "nasa_codebuild_role"
+resource "aws_iam_role" "nasa_codebuild_service_role" {
+  name = "nasa-codebuild-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -47,12 +47,12 @@ resource "aws_iam_role" "nasa_codebuild_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "nasa_codebuild_policy" {
-  role       = aws_iam_role.nasa_codebuild_role.name
+resource "aws_iam_role_policy_attachment" "nasa_codebuild_assume_policy" {
+  role       = aws_iam_role.nasa_codebuild_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
 }
 
-data "aws_iam_policy_document" "codebuild_logs_policy" {
+data "aws_iam_policy_document" "codebuild_policy" {
   statement {
     effect = "Allow"
     actions = [
@@ -76,14 +76,27 @@ data "aws_iam_policy_document" "codebuild_logs_policy" {
     ]
     resources=[aws_kms_key.nasa_s3_kms_key.arn]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "ecr:DescribeRepositories",
+      "ecr:ListImages",
+      "ecr:PutImage",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+    ]
+    resources=[aws_ecr_repository.nasa_frontend_repository.arn, aws_ecr_repository.nasa_backend_repository.arn]
+  }
 }
 
-resource "aws_iam_policy" "logs_policy" {
-  name   = "nasa_codepipeline_codebuild_logs_policy"
-  policy = data.aws_iam_policy_document.codebuild_logs_policy.json
+resource "aws_iam_policy" "codebuild_json_policy" {
+  name   = "nasa-codepipeline-codebuild-policy"
+  policy = data.aws_iam_policy_document.codebuild_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "logs_policy_attachment" {
-  role       = aws_iam_role.nasa_codebuild_role.name
-  policy_arn = aws_iam_policy.logs_policy.arn
+resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
+  role       = aws_iam_role.nasa_codebuild_service_role.name
+  policy_arn = aws_iam_policy.codebuild_json_policy.arn
 }
