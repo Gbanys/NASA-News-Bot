@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "codebuild_policy" {
       "ecr:UploadLayerPart",
       "ecr:CompleteLayerUpload",
     ]
-    resources=[aws_ecr_repository.nasa_frontend_repository.arn, aws_ecr_repository.nasa_backend_repository.arn]
+    resources=["*"]
   }
 }
 
