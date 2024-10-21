@@ -15,7 +15,7 @@ async def root(request: Request):
         request=request, 
         name="home.html",
         context={
-            "websocket_url" : "ws://127.0.0.1:5000/websocket"
+            "websocket_url" : f"ws://BACKEND_LOAD_BALANCER_URL/websocket"
         }
     )
 

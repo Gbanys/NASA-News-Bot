@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      name: backend-pod
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
