@@ -10,4 +10,3 @@ spec:
       targetPort: 8000
   selector:
     app: frontend
-  clusterIP: 172.20.1.55

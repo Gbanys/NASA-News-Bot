@@ -100,7 +100,25 @@ resource "aws_codestarnotifications_notification_rule" "manual_approval_notifica
 
 resource "aws_s3_bucket" "nasa_codepipeline_bucket" {
   bucket = "nasa-codepipeline-bucket"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
+
+resource "null_resource" "empty_codepipeline_s3_bucket" {
+  provisioner "local-exec" {
+    command = <<EOT
+    aws s3 rm s3://${aws_s3_bucket.nasa_codepipeline_bucket.bucket} --recursive
+    EOT
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+
 
 resource "aws_s3_bucket_public_access_block" "nasa_codepipeline_bucket_pab" {
   bucket = aws_s3_bucket.nasa_codepipeline_bucket.id

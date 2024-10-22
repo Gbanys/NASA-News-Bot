@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import os
 
 app = FastAPI()
 
@@ -15,7 +16,7 @@ async def root(request: Request):
         request=request, 
         name="home.html",
         context={
-            "websocket_url" : f"ws://BACKEND_LOAD_BALANCER_URL/websocket"
+            "websocket_url" : f"ws://{os.environ["BACKEND_LOAD_BALANCER_URL"]}/websocket"
         }
     )
 
