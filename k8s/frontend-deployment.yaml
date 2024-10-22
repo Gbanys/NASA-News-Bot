@@ -16,3 +16,9 @@ spec:
       containers:
       - name: frontend
         image: 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
+        env:
+        - name: BACKEND_LOAD_BALANCER_URL
+          valueFrom:
+            secretKeyRef:
+              name: frontend-secret
+              key: BACKEND_LOAD_BALANCER_URL
