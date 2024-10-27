@@ -6,7 +6,7 @@ resource "aws_codebuild_project" "nasa_codebuild_project" {
   source {
     type      = "GITHUB"
     location  = "https://github.com/Gbanys/NASA-News-Bot.git" # Change to your GitHub repo URL
-    buildspec = "buildspec.yml" # Adjust if your buildspec is named differently
+    buildspec = "buildspec.yml"                               # Adjust if your buildspec is named differently
   }
 
   environment {
@@ -23,10 +23,10 @@ resource "aws_codebuild_project" "nasa_codebuild_project" {
   service_role = aws_iam_role.nasa_codebuild_service_role.arn
 
   artifacts {
-    type = "S3"
-    location = "${aws_s3_bucket.nasa_codepipeline_bucket.bucket}"
-    packaging = "ZIP"
-    name = "build-output.zip"
+    type                   = "S3"
+    location               = aws_s3_bucket.nasa_codepipeline_bucket.bucket
+    packaging              = "ZIP"
+    name                   = "build-output.zip"
     override_artifact_name = true
   }
 }
@@ -65,21 +65,21 @@ data "aws_iam_policy_document" "codebuild_policy" {
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
-    resources=["*"]
+    resources = ["*"]
   }
   statement {
     effect = "Allow"
     actions = [
       "s3:GetObject"
     ]
-    resources=["arn:aws:s3:::nasa-codepipeline-bucket/*"]
+    resources = ["arn:aws:s3:::nasa-codepipeline-bucket/*"]
   }
   statement {
     effect = "Allow"
     actions = [
       "kms:Decrypt"
     ]
-    resources=[aws_kms_key.nasa_s3_kms_key.arn]
+    resources = [aws_kms_key.nasa_s3_kms_key.arn]
   }
 }
 

@@ -18,6 +18,9 @@ langchain-community = "^0.3.1"
 langchain-openai = "^0.2.2"
 langchain-chroma = "^0.1.4"
 fastapi = {extras = ["standard"], version = "^0.115.2"}
+secure-cookie = "^0.2.0"
+itsdangerous = "^2.2.0"
+boto3 = "^1.35.49"
 
 
 [build-system]

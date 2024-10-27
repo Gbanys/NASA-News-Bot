@@ -19,7 +19,7 @@ resource "aws_sns_topic_policy" "admin-sns-topic-policy" {
         Principal = {
           Service = "codestar-notifications.amazonaws.com"
         },
-        Action = "SNS:Publish",
+        Action   = "SNS:Publish",
         Resource = aws_sns_topic.admin-sns-topic.arn
       }
     ]

@@ -1,6 +1,6 @@
 resource "aws_codepipeline" "codepipeline" {
-  name     = "nasa-pipeline"
-  role_arn = aws_iam_role.nasa_codepipeline_role.arn
+  name          = "nasa-pipeline"
+  role_arn      = aws_iam_role.nasa_codepipeline_role.arn
   pipeline_type = "V2"
 
   artifact_store {
@@ -17,7 +17,7 @@ resource "aws_codepipeline" "codepipeline" {
     provider_type = "CodeStarSourceConnection"
     git_configuration {
       source_action_name = "Source"
-      push{
+      push {
         branches {
           includes = ["master"]
         }
@@ -47,13 +47,13 @@ resource "aws_codepipeline" "codepipeline" {
   stage {
     name = "Approve"
     action {
-        name     = "Approval"
-        category = "Approval"
-        owner    = "AWS"
-        provider = "Manual"
-        version  = "1"
-        configuration = {
-            CustomData      = "Please review and approve."
+      name     = "Approval"
+      category = "Approval"
+      owner    = "AWS"
+      provider = "Manual"
+      version  = "1"
+      configuration = {
+        CustomData = "Please review and approve."
       }
     }
   }
@@ -84,9 +84,9 @@ resource "aws_codestarconnections_connection" "nasa_repository_connection" {
 
 
 resource "aws_codestarnotifications_notification_rule" "manual_approval_notification_rule" {
-  name      = "manual-approval-notification"
+  name        = "manual-approval-notification"
   detail_type = "FULL"
-  resource = aws_codepipeline.codepipeline.arn
+  resource    = aws_codepipeline.codepipeline.arn
 
   event_type_ids = [
     "codepipeline-pipeline-manual-approval-needed"
@@ -100,10 +100,6 @@ resource "aws_codestarnotifications_notification_rule" "manual_approval_notifica
 
 resource "aws_s3_bucket" "nasa_codepipeline_bucket" {
   bucket = "nasa-codepipeline-bucket"
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "null_resource" "empty_codepipeline_s3_bucket" {
@@ -216,11 +212,11 @@ resource "aws_iam_role_policy" "nasa_codepipeline_policy" {
 }
 
 resource "aws_kms_key" "nasa_s3_kms_key" {
-  description             = "KMS key for encrypting S3 bucket"
-  key_usage               = "ENCRYPT_DECRYPT"
+  description              = "KMS key for encrypting S3 bucket"
+  key_usage                = "ENCRYPT_DECRYPT"
   customer_master_key_spec = "SYMMETRIC_DEFAULT"
-  deletion_window_in_days = 10
-  enable_key_rotation     = true
+  deletion_window_in_days  = 10
+  enable_key_rotation      = true
 }
 
 resource "aws_kms_alias" "nasa_s3_kms_alias" {
