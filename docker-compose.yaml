@@ -27,3 +27,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  qdrant:
+    image: qdrant/qdrant:v1.12.1
+    ports:
+      - "6333:6333"
+
