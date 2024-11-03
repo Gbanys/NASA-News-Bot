@@ -25,6 +25,9 @@ function onMessage(event){
             if(document.getElementsByClassName('chat-area')[0].id === data.delete_conversation_id){
                 switchToConversation(JSON.parse(data.conversations), -1)
             }
+            else{
+                switchToConversation(JSON.parse(data.conversations), document.getElementsByClassName('chat-area')[0].id, use_index=false)
+            }
             break;
     }
 }
@@ -54,7 +57,6 @@ function addAIChatBubble(userInput, chatBubbleId){
 function sendUserQueryToBackend(){
     const userInput = document.getElementById("user-input").value;
     const conversation_id = document.getElementsByClassName('chat-area')[0].id
-    window.alert(conversation_id);
     addUserChatBubble(userInput);
     socket.send(JSON.stringify({type : 'retrieve_ai_response', content : userInput, conversation_id : conversation_id, user_id : user_id}));
 }
@@ -63,8 +65,14 @@ function addConversation(){
     socket.send(JSON.stringify({type : 'add_conversation', user_id : user_id}));
 }
 
-function switchToConversation(conversations, conversation_index){
-    let conversation_id = conversations.at(conversation_index)['id'];
+function switchToConversation(conversations, conversation_index_or_id, use_index=true){
+    let conversation_id;
+    if(use_index){
+        conversation_id = conversations.at(conversation_index_or_id)['id'];
+    }
+    else{
+        conversation_id = conversation_index_or_id;
+    }
     document.getElementById("chat-item-" + conversation_id.toString()).style.backgroundColor = "#7a7a79";
     const chatArea = document.getElementsByClassName('chat-area')[0];
     chatArea.id = conversation_id
@@ -92,7 +100,7 @@ function getAllConversations(conversations) {
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.id = 'chat-item-' + conversation['id'].toString();
-        const conversationText = document.createTextNode(conversation['id']);
+        const conversationText = document.createTextNode("Chat " + conversation['id']);
         chatItem.appendChild(conversationText);
 
         const deleteIcon = document.createElement('img');
@@ -110,8 +118,6 @@ function getAllConversations(conversations) {
             if (!isActionInProgress) {
                 isActionInProgress = true;
                 console.log(`Deleting conversation with ID: ${chatItem.id}`);
-                const chatArea = document.getElementsByClassName('chat-area')[0];
-                chatArea.id = conversation['id'];
                 deleteConversation(chatItem.id, firstConversation['id']);
                 setTimeout(() => isActionInProgress = false, 300); // Reset flag after a delay
             }
