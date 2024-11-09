@@ -7,6 +7,13 @@ switchToConversation(conversations, 0);
 socket.onclose = () => {window.location.reload();}
 socket.onmessage = (event) => onMessage(event);
 
+document.getElementById('user-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendUserQueryToBackend();
+    }
+  });
+
 function onMessage(event){
     const data = JSON.parse(event.data)
     switch (data.type){
@@ -133,9 +140,12 @@ function addAIChatBubble(userInput, chatBubbleId, thumbs_value){
 
 function sendUserQueryToBackend(){
     const userInput = document.getElementById("user-input").value;
-    const conversation_id = document.getElementsByClassName('chat-area')[0].id
-    addUserChatBubble(userInput);
-    socket.send(JSON.stringify({type : 'retrieve_ai_response', content : userInput, conversation_id : conversation_id, user_id : user_id}));
+    if(userInput.trim() != ""){
+        document.getElementById('user-input').value = "";
+        const conversation_id = document.getElementsByClassName('chat-area')[0].id
+        addUserChatBubble(userInput);
+        socket.send(JSON.stringify({type : 'retrieve_ai_response', content : userInput, conversation_id : conversation_id, user_id : user_id}));
+    }
 }
 
 function addConversation(){
@@ -234,17 +244,26 @@ function deleteConversation(delete_conversation_id, first_conversation_id){
 function streamMessage(message, containerId, delay = 30) {
     const container = document.getElementById(containerId);
     const paragraph = container.getElementsByTagName('p')[0];
+    const userInput = document.getElementById('user-input');
+    const userInputButton = document.getElementsByClassName("send-btn")[0];
+    userInput.disabled = true;
+    userInputButton.disabled = true;
     paragraph.innerHTML = "";
     let index = 0;
+
     function addNextCharacter() {
         if (index < message.length) {
             paragraph.innerHTML += message[index];
             index++;
             setTimeout(addNextCharacter, delay);
+        } else {
+            userInput.disabled = false;
+            userInputButton.disabled = false;
         }
     }
     addNextCharacter();
 }
+
 
 
 function getAllMessages(message_history, streaming=false) {

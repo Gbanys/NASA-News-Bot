@@ -1,15 +1,26 @@
+from typing import Any
 from langchain_openai import OpenAIEmbeddings
 from langchain.vectorstores import Qdrant
 import qdrant_client
 import os
-from langchain.agents import AgentExecutor, AgentType, initialize_agent, create_tool_calling_agent, tool, load_tools
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.tools import StructuredTool
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from mysql_database.message_history import get_message_history, get_questions_and_answers_from_database
-from langchain_core.messages import HumanMessage, AIMessage
+import boto3
 
+ssm_client = boto3.client('ssm', region_name='eu-west-2')
+def get_parameter(param_name, with_decryption=True) -> Any:
+    response = ssm_client.get_parameter(
+        Name=param_name,
+        WithDecryption=with_decryption
+    )
+    return response['Parameter']['Value']
+
+
+os.environ["OPENAI_API_KEY"] = get_parameter('/nasa_chatbot/openai_api_key')
 
 
 def retrieve_information_from_nasa_vectorstore(user_input: str) -> str:
