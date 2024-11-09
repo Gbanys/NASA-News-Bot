@@ -26,7 +26,7 @@ os.environ["OPENAI_API_KEY"] = get_parameter('/nasa_chatbot/openai_api_key')
 def retrieve_information_from_nasa_vectorstore(user_input: str) -> str:
     "Retrieve news articles from NASA"
     embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
-    client = qdrant_client.QdrantClient(host="nasa-news-bot_qdrant_1", port=6333)
+    client = qdrant_client.QdrantClient(host=os.environ["QDRANT_HOST"], port=6333)
     qdrant = Qdrant(
         client=client,
         collection_name="nasa_web_pages",
