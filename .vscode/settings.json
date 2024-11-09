@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "/home/repositories/NASA-News-Bot",
+    "terminal.integrated.env.linux": {"PYTHONPATH": "${workspaceFolder}"}
+}
