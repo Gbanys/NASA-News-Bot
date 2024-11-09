@@ -24,6 +24,7 @@ boto3 = "^1.35.49"
 langchain-qdrant = "^0.1.4"
 redis = "^5.2.0"
 mysql-connector-python = "^9.1.0"
+python-jose = "^3.3.0"
 
 
 [build-system]

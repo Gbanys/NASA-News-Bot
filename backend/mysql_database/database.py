@@ -91,7 +91,27 @@ def add_answer(answer: str, question_id: int):
     mysql_database.commit()
 
 
+def add_feedback_to_answer(answer_id: int, feedback: str):
+    print("Hellloooooooooo")
+    print(feedback)
+    sql = "UPDATE answer SET feedback = %s WHERE id = %s;"
+    cursor.execute(sql, (feedback, answer_id))
+    mysql_database.commit()
+
+
 def get_answers_by_question(question_id: int):
     sql= f"SELECT * FROM answer WHERE question_id = {question_id};"
     cursor.execute(sql)
     return cursor.fetchall()
+
+
+def get_answers_by_id(answer_id: int):
+    sql= f"SELECT * FROM answer WHERE id = {answer_id};"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+
+def update_thumbs_value_in_database(answer_id: int, thumbs_value: int):
+    sql= f"UPDATE answer SET thumbs_value = {thumbs_value} WHERE id = {answer_id};"
+    cursor.execute(sql)
+    mysql_database.commit()

@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from mysql_database.message_history import get_message_history, get_questions_and_answers_from_database
 from nasa_answer_generator import query
-from mysql_database.database import add_conversation, add_conversation_with_specific_id, add_user, delete_conversation, get_answers_by_question, get_conversation_by_conversation_id, get_conversation_by_user, get_questions_by_conversation, get_user_by_name
+from mysql_database.database import add_conversation, add_conversation_with_specific_id, add_feedback_to_answer, add_user, delete_conversation, get_answers_by_id, get_answers_by_question, get_conversation_by_conversation_id, get_conversation_by_user, get_questions_by_conversation, get_user_by_name, update_thumbs_value_in_database
 import json
 
 class User(BaseModel):
@@ -39,7 +39,6 @@ async def main(websocket: WebSocket):
             )
         elif data["type"] == "get_questions_and_answers":
             message_history = await get_questions_and_answers(int(data["conversation_id"]))
-            print(message_history)
             conversations = await get_conversation_from_database(int(data["user_id"]))
             await websocket.send_json(
                 {
@@ -69,6 +68,27 @@ async def main(websocket: WebSocket):
                     "delete_conversation_id" : data["delete_conversation_id"]
                 }
             )
+        elif data["type"] == "update_thumbs_value":
+            answer = await get_answers_by_answer_id_in_database(int(data["answer_id"]))
+            if answer[0][3] == data["thumbs_value"]:
+                thumbs_value = 0
+            else:
+                thumbs_value = int(data["thumbs_value"])
+            await update_thumbs_value(data["answer_id"], thumbs_value)
+            message_history = await get_questions_and_answers(int(data["conversation_id"]))
+            conversations = await get_conversation_from_database(int(data["user_id"]))
+            await websocket.send_json(
+                {
+                    "type" : "update_thumbs_value",
+                    "message_history" : json.dumps(message_history),
+                    "conversation_id" : int(data["conversation_id"]),
+                    "answer_id" : int(data["answer_id"]),
+                    "conversations" : conversations
+                }
+            )
+        elif data["type"] == "submit_feedback":
+            await add_feedback(answer_id=int(data["answer_id"]), feedback=data["feedback"])
+
 
 
 async def retrieve_ai_response(user_id: int, userInput: str, conversation_id: int) -> list:
@@ -115,3 +135,12 @@ async def add_conversation_with_specific_id_to_database(user_id: int, conversati
 
 async def delete_conversation_from_database(conversation_id: int) -> None:
     delete_conversation(conversation_id)
+
+async def update_thumbs_value(answer_id: int, thumbs_value: int) -> None:
+    update_thumbs_value_in_database(answer_id, thumbs_value)
+
+async def get_answers_by_answer_id_in_database(answer_id: int):
+    return get_answers_by_id(answer_id)
+
+async def add_feedback(answer_id: int, feedback: str) -> None:
+    add_feedback_to_answer(answer_id, feedback)

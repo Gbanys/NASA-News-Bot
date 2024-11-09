@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatGPT Layout</title>
+  <title>NASA News Bot</title>
+  <link rel="icon" type="image/x-icon" href="/static/images/nasa-logo.png">
   <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <script>
@@ -13,6 +14,18 @@
     const message_history = JSON.parse('{{ message_history|safe }}');
 </script>
 <body>
+<div id="feedback-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Please give us some feedback:</h3>
+      <br><br>
+      <textarea id="feedback-textarea" placeholder="Write your feedback..."></textarea>
+      <br><br><br>
+      <div style="text-align: center;">
+      <button id="feedback-submit-button" onClick="submitFeedback()">Submit</button>
+      </div>
+    </div>
+  </div>
   <div class="container">
     <aside class="sidebar">
       <div style="margin-bottom: 20px;">
@@ -32,6 +45,7 @@
       <div class="chat-box" id="chat-box">
         <div class="chat-bubble ai", id="chat-bubble-ai">
         <p>Hello! How can I help you today?</p>
+        <img src="/static/images/like.png" width="25px;" height="25px;">
         </div>
       </div>
       <div class="input-area">

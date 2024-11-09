@@ -44,5 +44,5 @@ def get_questions_and_answers_from_database(session_id: int) -> list:
         messages.append({"id" : question[0], "chat-bubble user" : question[1]})
         answers = get_answers_by_question(question_id=question[0])
         for answer in answers:
-            messages.append({"id" : answer[0], "chat-bubble ai" : answer[1]})
+            messages.append({"id" : answer[0], "chat-bubble ai" : answer[1], "thumbs_value" : answer[3]})
     return messages

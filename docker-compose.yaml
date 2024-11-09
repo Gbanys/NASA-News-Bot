@@ -15,6 +15,9 @@ services:
       - PYTHONUNBUFFERED=1
       - BACKEND_LOAD_BALANCER_URL
       - BACKEND_WEBSOCKET_URL
+      - ENVIRONMENT
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
     depends_on:
       - backend
 

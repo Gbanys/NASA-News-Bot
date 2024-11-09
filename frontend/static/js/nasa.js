@@ -1,4 +1,7 @@
 const socket = new WebSocket(websocketUrl);
+var span = document.getElementsByClassName("close")[0];
+var feedback_button = document.getElementById("feedback-submit-button");
+
 getAllConversations(conversations);
 switchToConversation(conversations, 0);
 socket.onclose = () => {window.location.reload();}
@@ -19,6 +22,10 @@ function onMessage(event){
         case 'get_questions_and_answers':
             getAllMessages(data.message_history);
             break;
+        case 'update_thumbs_value':
+            getAllMessages(data.message_history);
+            switchToConversation(JSON.parse(data.conversations), data.conversation_id, use_index=false);
+            break;
         case 'delete_conversation':
             getAllConversations(JSON.parse(data.conversations));
             getAllMessages(data.message_history);
@@ -32,7 +39,15 @@ function onMessage(event){
     }
 }
 
-function ChatBubble(user_query, speaker, chatBubbleId) {
+function submitFeedback(){
+    user_feedback = document.getElementById("feedback-textarea").value;
+    window.alert("Thank you for your feedback");
+    let modal = document.getElementsByClassName("modal")[0];
+    modal.style.display = "none";
+    socket.send(JSON.stringify({type : 'submit_feedback', answer_id: modal.id.split("-").at(-1), feedback: user_feedback}));
+}
+
+function ChatBubble(user_query, speaker, chatBubbleId, thumbs_value) {
   const chatBox = document.getElementById("chat-box");
   const chatBubble = document.createElement("div");
   chatBubble.classList.add("chat-bubble", speaker);
@@ -41,8 +56,70 @@ function ChatBubble(user_query, speaker, chatBubbleId) {
   const message = document.createElement("p");
   message.textContent = user_query;
   chatBubble.appendChild(message);
-  chatBox.appendChild(chatBubble);
 
+  if(speaker === 'ai' && chatBubbleId.split("-").at(-1) != "undefined"){
+    const clipboard = document.createElement("img")
+    clipboard.src = "/static/images/copy.png";
+    clipboard.className = "clipboard"
+    clipboard.id = "clipboard-" + chatBubbleId;
+    clipboard.title = 'Copy to clipboard';
+    chatBubble.appendChild(clipboard);
+
+    clipboard.addEventListener('click', function() {
+    });
+
+    const feedback = document.createElement("img")
+    feedback.src = "/static/images/comment.png";
+    feedback.className = "user-feedback";
+    feedback.id = "user-feedback-" + chatBubbleId;
+    feedback.title = 'Give feedback';
+    chatBubble.appendChild(feedback);
+
+    let modal = document.getElementsByClassName("modal")[0];
+
+    feedback.addEventListener('click', function() {
+        modal.style.display = "block";
+        modal.id = "feedback-modal-" + chatBubbleId;
+    });
+    span.addEventListener('click', function() {
+        modal.style.display = "none";
+    });
+
+    const thumbs_down_image = document.createElement("img")
+    thumbs_down_image.src = "/static/images/dislike.png";
+    thumbs_down_image.className = "thumbs-down";
+    thumbs_down_image.id = "thumbs-down-" + chatBubbleId;
+    thumbs_down_image.title = "I don't like this response";
+    chatBubble.appendChild(thumbs_down_image);
+
+    thumbs_down_image.addEventListener('click', function() {
+        socket.send(JSON.stringify({type : 'update_thumbs_value', answer_id: chatBubbleId.split("-").at(-1), thumbs_value: -1, conversation_id: conversation_id, user_id : user_id}));
+    });
+
+    const thumbs_up_image = document.createElement("img")
+    thumbs_up_image.src = "/static/images/like.png";
+    thumbs_up_image.className = "thumbs-up";
+    thumbs_up_image.id = "thumbs-up-" + chatBubbleId;
+    thumbs_up_image.title = "I like this response";
+    chatBubble.appendChild(thumbs_up_image);
+    let conversation_id = document.getElementsByClassName('chat-area')[0].id
+
+    thumbs_up_image.addEventListener('click', function() {
+        socket.send(JSON.stringify({type : 'update_thumbs_value', answer_id: chatBubbleId.split("-").at(-1), thumbs_value: 1, conversation_id: conversation_id, user_id : user_id}));
+    });
+
+    if(thumbs_value === 1){
+        thumbs_up_image.style.border = "2px solid rgb(26, 233, 26)";
+    }
+    else if(thumbs_value === -1){
+        thumbs_down_image.style.border = "2px solid rgb(206, 9, 9)";
+    }
+    else{
+        thumbs_up_image.style.border = "none";
+        thumbs_down_image.style.border = "none";
+    }
+  }
+  chatBox.appendChild(chatBubble);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
@@ -50,8 +127,8 @@ function addUserChatBubble(userInput, chatBubbleId){
     ChatBubble(userInput, "user", "user-chat-bubble-" + chatBubbleId);
 }
 
-function addAIChatBubble(userInput, chatBubbleId){
-    ChatBubble(userInput, "ai", "ai-chat-bubble-" + chatBubbleId);
+function addAIChatBubble(userInput, chatBubbleId, thumbs_value){
+    ChatBubble(userInput, "ai", "ai-chat-bubble-" + chatBubbleId, thumbs_value);
 }
 
 function sendUserQueryToBackend(){
@@ -100,7 +177,7 @@ function getAllConversations(conversations) {
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.id = 'chat-item-' + conversation['id'].toString();
-        const conversationText = document.createTextNode("Chat " + conversation['id']);
+        const conversationText = document.createTextNode("Conversation ID: " + conversation['id']);
         chatItem.appendChild(conversationText);
 
         const deleteIcon = document.createElement('img');
@@ -156,11 +233,12 @@ function deleteConversation(delete_conversation_id, first_conversation_id){
 }
 function streamMessage(message, containerId, delay = 30) {
     const container = document.getElementById(containerId);
-    container.innerHTML = "";
+    const paragraph = container.getElementsByTagName('p')[0];
+    paragraph.innerHTML = "";
     let index = 0;
     function addNextCharacter() {
         if (index < message.length) {
-            container.innerHTML += message[index];
+            paragraph.innerHTML += message[index];
             index++;
             setTimeout(addNextCharacter, delay);
         }
@@ -180,13 +258,13 @@ function getAllMessages(message_history, streaming=false) {
         const message = message_history[message_index];
 
         if ("chat-bubble ai" in message && message_index == message_history.length - 1 && streaming === true){
-            addAIChatBubble(message["chat-bubble ai"], message["id"]);
+            addAIChatBubble(message["chat-bubble ai"], message["id"], message["thumbs_value"]);
             streamMessage(message["chat-bubble ai"], "ai-chat-bubble-"+message["id"])
         }
         else if ("chat-bubble user" in message) {
             addUserChatBubble(message["chat-bubble user"], message["id"]);
         } else {
-            addAIChatBubble(message["chat-bubble ai"], message["id"]);
+            addAIChatBubble(message["chat-bubble ai"], message["id"], message["thumbs_value"]);
         }
     }
 }

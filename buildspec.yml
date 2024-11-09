@@ -8,6 +8,7 @@ phases:
       - echo "Installing dependencies..."
       - apt-get update
       - apt-get install -y make docker-compose docker.io
+      - touch .env
   
   pre_build:
     commands:
@@ -23,3 +24,7 @@ phases:
       - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
       - docker tag docker.io/library/src_backend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
       - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
+      - docker tag docker.io/library/src_mysql:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_mysql:latest
+      - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_mysql:latest
+      - docker tag docker.io/library/src_qdrant:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_qdrant:latest
+      - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_qdrant:latest
