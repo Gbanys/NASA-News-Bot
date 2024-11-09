@@ -16,6 +16,7 @@ services:
       - BACKEND_LOAD_BALANCER_URL
       - BACKEND_WEBSOCKET_URL
       - ENVIRONMENT
+      - REDIRECT_URI
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
     depends_on:

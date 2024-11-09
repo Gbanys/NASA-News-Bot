@@ -36,7 +36,7 @@ if os.environ["ENVIRONMENT"] == "PRODUCTION":
     COGNITO_DOMAIN = get_parameter('/nasa_chatbot/cognito_domain')
     COGNITO_CLIENT_ID = get_parameter('/nasa_chatbot/cognito_app_client_id')
     COGNITO_CLIENT_SECRET = get_parameter('/nasa_chatbot/cognito_app_client_secret')
-    REDIRECT_URI = f"http://localhost:8000/callback"
+    REDIRECT_URI = f"http://{os.environ["REDIRECT_URI"]}/callback"
 
     # The URL to redirect users to for authentication
     @app.get("/login")
