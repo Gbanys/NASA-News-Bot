@@ -14,6 +14,15 @@ document.getElementById('user-input').addEventListener('keydown', function(event
     }
   });
 
+const temperatureSlider = document.getElementById('temperature_slider');
+const temperatureValue = document.getElementById('temperature_value');
+
+temperatureValue.textContent = (temperatureSlider.value / 100 * 1.5).toFixed(2);
+
+temperatureSlider.addEventListener('input', function() {
+    temperatureValue.textContent = (temperatureSlider.value / 100 * 1.5).toFixed(2);
+});
+
 function onMessage(event){
     const data = JSON.parse(event.data)
     switch (data.type){
@@ -54,17 +63,21 @@ function submitFeedback(){
     socket.send(JSON.stringify({type : 'submit_feedback', answer_id: modal.id.split("-").at(-1), feedback: user_feedback}));
 }
 
-function ChatBubble(user_query, speaker, chatBubbleId, thumbs_value) {
-  const chatBox = document.getElementById("chat-box");
-  const chatBubble = document.createElement("div");
-  chatBubble.classList.add("chat-bubble", speaker);
-  chatBubble.id = chatBubbleId;
+function getCurrentFormattedDateTime() {
+    const now = new Date();
 
-  const message = document.createElement("p");
-  message.textContent = user_query;
-  chatBubble.appendChild(message);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed, so add 1
+    const day = String(now.getDate()).padStart(2, '0');
 
-  if(speaker === 'ai' && chatBubbleId.split("-").at(-1) != "undefined"){
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+function addFeedbackBox(chatBubble, chatBubbleId, thumbs_value){
     const clipboard = document.createElement("img")
     clipboard.src = "/static/images/copy.png";
     clipboard.className = "clipboard"
@@ -125,26 +138,56 @@ function ChatBubble(user_query, speaker, chatBubbleId, thumbs_value) {
         thumbs_up_image.style.border = "none";
         thumbs_down_image.style.border = "none";
     }
+    return chatBubble;
+}
+
+function ChatBubble(user_query, speaker, chatBubbleId, thumbs_value, timestamp, streaming=false) {
+  const chatBox = document.getElementById("chat-box");
+  let chatBubble = document.createElement("div");
+  chatBubble.classList.add("chat-bubble", speaker);
+  chatBubble.id = chatBubbleId;
+  
+  let time = document.createElement("p");
+  time.className = "timestamp";
+  time.textContent = timestamp;
+  chatBubble.appendChild(time);
+
+  const message = document.createElement("p");
+  message.textContent = user_query;
+  chatBubble.appendChild(message);
+
+  if(speaker === 'ai' && chatBubbleId.split("-").at(-1) != "undefined" && streaming != true){
+    chatBubble = addFeedbackBox(chatBubble, chatBubbleId, thumbs_value);
   }
   chatBox.appendChild(chatBubble);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function addUserChatBubble(userInput, chatBubbleId){
-    ChatBubble(userInput, "user", "user-chat-bubble-" + chatBubbleId);
+function addUserChatBubble(userInput, chatBubbleId, timestamp){
+    ChatBubble(userInput, "user", "user-chat-bubble-" + chatBubbleId, null, timestamp);
 }
 
-function addAIChatBubble(userInput, chatBubbleId, thumbs_value){
-    ChatBubble(userInput, "ai", "ai-chat-bubble-" + chatBubbleId, thumbs_value);
+function addAIChatBubble(userInput, chatBubbleId, thumbs_value, timestamp, streaming=false){
+    ChatBubble(userInput, "ai", "ai-chat-bubble-" + chatBubbleId, thumbs_value, timestamp, streaming);
 }
 
 function sendUserQueryToBackend(){
     const userInput = document.getElementById("user-input").value;
     if(userInput.trim() != ""){
         document.getElementById('user-input').value = "";
+        document.getElementById('status_message').innerText = "Searching for information..."
+        document.getElementById('status_message_div').style.visibility = "visible";
         const conversation_id = document.getElementsByClassName('chat-area')[0].id
-        addUserChatBubble(userInput);
-        socket.send(JSON.stringify({type : 'retrieve_ai_response', content : userInput, conversation_id : conversation_id, user_id : user_id}));
+        let timestamp = getCurrentFormattedDateTime();
+        addUserChatBubble(userInput, "", timestamp);
+        socket.send(JSON.stringify(
+            {type : 'retrieve_ai_response', 
+            content : userInput, 
+            conversation_id : conversation_id, 
+            user_id : user_id,
+            temperature : temperatureValue.textContent,
+            timestamp: timestamp
+        }));
     }
 }
 
@@ -187,7 +230,7 @@ function getAllConversations(conversations) {
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.id = 'chat-item-' + conversation['id'].toString();
-        const conversationText = document.createTextNode("Conversation ID: " + conversation['id']);
+        const conversationText = document.createTextNode(conversation['timestamp'].replace("T"," "));
         chatItem.appendChild(conversationText);
 
         const deleteIcon = document.createElement('img');
@@ -241,11 +284,14 @@ function deleteConversation(delete_conversation_id, first_conversation_id){
         }
     ));
 }
-function streamMessage(message, containerId, delay = 30) {
+function streamMessage(message, containerId, timestamp, delay = 30) {
     const container = document.getElementById(containerId);
-    const paragraph = container.getElementsByTagName('p')[0];
+    const paragraph = container.getElementsByTagName('p')[1];
     const userInput = document.getElementById('user-input');
     const userInputButton = document.getElementsByClassName("send-btn")[0];
+    container.getElementsByTagName('p')[0].textContent = timestamp
+    document.getElementById('status_message').innerText = "Typing..."
+    document.getElementById('status_message_div').style.visibility = "visible";
     userInput.disabled = true;
     userInputButton.disabled = true;
     paragraph.innerHTML = "";
@@ -259,6 +305,9 @@ function streamMessage(message, containerId, delay = 30) {
         } else {
             userInput.disabled = false;
             userInputButton.disabled = false;
+            document.getElementById('status_message').innerText = "";
+            document.getElementById('status_message_div').style.visibility = "hidden";
+            addFeedbackBox(container, containerId, 0)
         }
     }
     addNextCharacter();
@@ -277,13 +326,13 @@ function getAllMessages(message_history, streaming=false) {
         const message = message_history[message_index];
 
         if ("chat-bubble ai" in message && message_index == message_history.length - 1 && streaming === true){
-            addAIChatBubble(message["chat-bubble ai"], message["id"], message["thumbs_value"]);
-            streamMessage(message["chat-bubble ai"], "ai-chat-bubble-"+message["id"])
+            addAIChatBubble(message["chat-bubble ai"], message["id"], message["thumbs_value"], message["timestamp"], streaming);
+            streamMessage(message["chat-bubble ai"], "ai-chat-bubble-"+message["id"], message["timestamp"])
         }
         else if ("chat-bubble user" in message) {
-            addUserChatBubble(message["chat-bubble user"], message["id"]);
+            addUserChatBubble(message["chat-bubble user"], message["id"], message["timestamp"]);
         } else {
-            addAIChatBubble(message["chat-bubble ai"], message["id"], message["thumbs_value"]);
+            addAIChatBubble(message["chat-bubble ai"], message["id"], message["thumbs_value"], message["timestamp"]);
         }
     }
 }

@@ -35,6 +35,10 @@
       <button class="new-chat-btn" onclick="addConversation()">New Chat<span>&#43;</span></button>
       <div class="chat-history">
       </div>
+      <div class="temperature_container">
+        <p style="margin-bottom: 20px;">Temperature: <span id="temperature_value"></span></p>
+        <input id="temperature_slider" type="range" min="0" max="100" value="50">
+      </div>
       <footer class="sidebar-footer">
         <button>Settings</button>
         <button>Log Out</button>
@@ -44,9 +48,14 @@
     <main class="chat-area">
       <div class="chat-box" id="chat-box">
         <div class="chat-bubble ai", id="chat-bubble-ai">
+        <p class="timestamp"></p>
         <p>Hello! How can I help you today?</p>
         <img src="/static/images/like.png" width="25px;" height="25px;">
         </div>
+      </div>
+      <div id="status_message_div" style="margin: 10px 15px; visibility: hidden;">
+        <div class="loader"></div>
+        <p id="status_message" style="margin: 5px 10px;"></p>
       </div>
       <div class="input-area">
         <textarea id="user-input" placeholder="Type your message..."></textarea>

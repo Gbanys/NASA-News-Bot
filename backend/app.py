@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from mysql_database.message_history import get_message_history, get_questions_and_answers_from_database
 from nasa_answer_generator import query
-from mysql_database.database import add_conversation, add_conversation_with_specific_id, add_feedback_to_answer, add_user, delete_conversation, get_answers_by_id, get_answers_by_question, get_conversation_by_conversation_id, get_conversation_by_user, get_questions_by_conversation, get_user_by_name, update_thumbs_value_in_database
+from mysql_database.database import add_conversation, add_conversation_with_specific_id, add_feedback_to_answer, add_user, delete_conversation, get_answers_by_id, get_answers_by_question, get_conversation_by_conversation_id, get_conversation_by_user, get_questions_by_conversation, get_user_by_name, update_thumbs_value_in_database, update_timestamp_for_question
 import json
 
 class User(BaseModel):
@@ -28,7 +28,7 @@ async def main(websocket: WebSocket):
     while True:
         data = await websocket.receive_json()
         if data["type"] == "retrieve_ai_response":
-            new_message_history = await retrieve_ai_response(int(data["user_id"]), data["content"], int(data["conversation_id"]))
+            new_message_history = await retrieve_ai_response(int(data["user_id"]), data["content"], int(data["conversation_id"]), float(data["temperature"]), data["timestamp"])
             conversations = await get_conversation_from_database(int(data["user_id"]))
             await websocket.send_json(
                 {
@@ -90,12 +90,14 @@ async def main(websocket: WebSocket):
             await add_feedback(answer_id=int(data["answer_id"]), feedback=data["feedback"])
 
 
-
-async def retrieve_ai_response(user_id: int, userInput: str, conversation_id: int) -> list:
+async def retrieve_ai_response(user_id: int, userInput: str, conversation_id: int, temperature: float, timestamp: str) -> list:
     conversation = get_conversation_by_conversation_id(conversation_id)
     if not conversation:
         add_conversation_with_specific_id(user_id, conversation_id)
-    message_history = query(userInput, conversation_id)
+    message_history = query(userInput, conversation_id, temperature)
+    question_id = get_questions_by_conversation(conversation_id)[-1][0]
+    update_timestamp_for_question(question_id, timestamp)
+    message_history = get_questions_and_answers_from_database(conversation_id)
     return message_history
 
 

@@ -45,7 +45,7 @@ def add_conversation(user_id: int) -> None:
     mysql_database.commit()
 
 
-def add_conversation_with_specific_id(user_id: int, conversation_id: int):
+def add_conversation_with_specific_id(user_id: int, conversation_id: int) -> None:
     sql = "INSERT INTO conversation (id, user_id, timestamp) VALUES (%s, %s, %s)"
     timestamp = datetime.now()
     val = (conversation_id, user_id, timestamp)
@@ -71,9 +71,10 @@ def get_conversation_by_conversation_id(conversation_id: int) -> None:
     return cursor.fetchall()
 
 
-def add_question(question: str, conversation_id: int):
-    sql = "INSERT INTO question (question, conversation_id) VALUES (%s, %s)"
-    val = (question, conversation_id)
+def add_question(question: str, conversation_id: int) -> None:
+    sql = "INSERT INTO question (question, conversation_id, timestamp) VALUES (%s, %s, %s)"
+    timestamp = datetime.now()
+    val = (question, conversation_id, timestamp)
     cursor.execute(sql, val)
     mysql_database.commit()
 
@@ -84,16 +85,15 @@ def get_questions_by_conversation(conversation_id: int):
     return cursor.fetchall()
 
 
-def add_answer(answer: str, question_id: int):
-    sql = "INSERT INTO answer (answer, question_id) VALUES (%s, %s)"
-    val = (answer,question_id)
+def add_answer(answer: str, question_id: int) -> None:
+    sql = "INSERT INTO answer (answer, question_id, timestamp) VALUES (%s, %s, %s)"
+    timestamp = datetime.now()
+    val = (answer, question_id, timestamp)
     cursor.execute(sql, val)
     mysql_database.commit()
 
 
-def add_feedback_to_answer(answer_id: int, feedback: str):
-    print("Hellloooooooooo")
-    print(feedback)
+def add_feedback_to_answer(answer_id: int, feedback: str) -> None:
     sql = "UPDATE answer SET feedback = %s WHERE id = %s;"
     cursor.execute(sql, (feedback, answer_id))
     mysql_database.commit()
@@ -111,7 +111,13 @@ def get_answers_by_id(answer_id: int):
     return cursor.fetchall()
 
 
-def update_thumbs_value_in_database(answer_id: int, thumbs_value: int):
+def update_thumbs_value_in_database(answer_id: int, thumbs_value: int) -> None:
     sql= f"UPDATE answer SET thumbs_value = {thumbs_value} WHERE id = {answer_id};"
     cursor.execute(sql)
+    mysql_database.commit()
+
+
+def update_timestamp_for_question(question_id: int, timestamp: str) -> None:
+    sql= "UPDATE question SET timestamp = %s WHERE id = %s;"
+    cursor.execute(sql, (timestamp, question_id))
     mysql_database.commit()

@@ -297,3 +297,87 @@
 #feedback-submit-button:hover{
     background-color: rgb(8, 159, 8);
 }
+
+@keyframes customBlink {
+    0%, 100% { font-size: 16px; color: rgb(63, 62, 62); }
+    50% { font-size: 16px; color: rgb(217, 217, 221); }
+  }
+  
+#status_message {
+    animation: customBlink 2s linear infinite;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.loader {
+    border: 5px solid #404040;
+    border-radius: 50%;
+    border-top: 5px solid #e5e6e7;
+    width: 25px;
+    height: 25px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+.temperature_container {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+#temperature_slider {
+    -webkit-appearance: none; /* Remove default styling */
+    width: 100%; /* Adjust the width as needed */
+    height: 8px; /* Adjust the track height */
+    background: linear-gradient(to right, #3e3e3e, #f43a14); /* Change the track color */
+    border-radius: 5px; /* Rounded track */
+    outline: none; /* Remove the outline */
+  }
+  
+  /* Style the thumb (handle) */
+  #temperature_slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Remove default styling */
+    appearance: none;
+    width: 20px; /* Adjust handle width */
+    height: 20px; /* Adjust handle height */
+    background-color: #828582; /* Handle color */
+    border-radius: 50%; /* Rounded handle */
+    cursor: pointer; /* Pointer cursor on hover */
+  }
+  
+  /* Style for other browsers (Firefox) */
+  #temperature_slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #696a69;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  #temperature_slider::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #6f706f;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+.timestamp{
+    color: #6f706f;
+    font-style: italic;
+    font-size: 15px;
+}
+  
