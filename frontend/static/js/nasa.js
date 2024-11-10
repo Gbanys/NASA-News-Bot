@@ -40,7 +40,7 @@ function onMessage(event){
             break;
         case 'update_thumbs_value':
             getAllMessages(data.message_history);
-            switchToConversation(JSON.parse(data.conversations), data.conversation_id, use_index=false);
+            //switchToConversation(data.conversations, data.conversation_id, use_index=false);
             break;
         case 'delete_conversation':
             getAllConversations(JSON.parse(data.conversations));
@@ -143,6 +143,7 @@ function addFeedbackBox(chatBubble, chatBubbleId, thumbs_value){
 
 function ChatBubble(user_query, speaker, chatBubbleId, thumbs_value, timestamp, streaming=false) {
   const chatBox = document.getElementById("chat-box");
+  const isAtBottom = chatBox.scrollHeight - chatBox.scrollTop === chatBox.clientHeight;
   let chatBubble = document.createElement("div");
   chatBubble.classList.add("chat-bubble", speaker);
   chatBubble.id = chatBubbleId;

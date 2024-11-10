@@ -70,7 +70,7 @@ async def main(websocket: WebSocket):
             )
         elif data["type"] == "update_thumbs_value":
             answer = await get_answers_by_answer_id_in_database(int(data["answer_id"]))
-            if answer[0][3] == data["thumbs_value"]:
+            if answer[0][4] == data["thumbs_value"]:
                 thumbs_value = 0
             else:
                 thumbs_value = int(data["thumbs_value"])
