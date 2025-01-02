@@ -33,7 +33,7 @@ cursor.execute(
         conversation_id INT,
         FOREIGN KEY (conversation_id) REFERENCES conversation(id) ON DELETE CASCADE
     );
-    CREATE TABLE answer IF NOT EXISTS(
+    CREATE TABLE IF NOT EXISTS answer (
         id INT AUTO_INCREMENT PRIMARY KEY, 
         answer MEDIUMTEXT, 
         feedback VARCHAR(255),

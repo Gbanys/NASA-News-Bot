@@ -16,7 +16,6 @@ You must set the following environment variables:
 
 Additionally, you should include these default environment variables in your `.env` file:
 
-```plaintext
 DB_USER=root
 DB_HOSTNAME=mysql
 BACKEND_LOAD_BALANCER_URL=nasa-news-bot-backend-1:5000
@@ -34,3 +33,7 @@ the below command without running `make build`. The command below should build i
 
 ```make start```
 
+Finally, once all containers are running, ensure that the qdrant vectorstore is populated with embeddings.
+You may choose to use the snapshot file that is provided and then run this command:
+
+```make restore-snapshot```
