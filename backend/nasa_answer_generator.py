@@ -20,8 +20,8 @@ def get_parameter(param_name, with_decryption=True) -> Any:
     )
     return response['Parameter']['Value']
 
-
-os.environ["OPENAI_API_KEY"] = get_parameter('/nasa_chatbot/openai_api_key')
+if os.environ["ENVIRONMENT"] == "PRODUCTION":
+    os.environ["OPENAI_API_KEY"] = get_parameter('/nasa_chatbot/openai_api_key')
 
 
 def retrieve_information_from_nasa_vectorstore(user_input: str) -> str:

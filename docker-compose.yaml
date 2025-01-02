@@ -36,6 +36,7 @@ services:
       - PYTHONUNBUFFERED=1
       - MYSQL_ROOT_PASSWORD
       - OPENAI_API_KEY
+      - ENVIRONMENT
       - DB_USER
       - DB_HOSTNAME
       - AWS_ACCESS_KEY_ID
@@ -53,6 +54,6 @@ services:
   mysql:
     image: mysql:latest
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD

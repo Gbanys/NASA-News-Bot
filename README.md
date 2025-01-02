@@ -9,17 +9,6 @@ Before running the application, make sure to create a `.env` file for local deve
 You must set the following environment variables:
 
 - **MYSQL_ROOT_PASSWORD**: Your MySQL root password
-- **OPENAI_API_KEY**: Your OpenAI API key# NASA News Bot
-
-## Environment Configuration
-
-Before running the application, make sure to create a `.env` file for local development. This file should contain the necessary environment variables, which you should configure according to your own setup.
-
-### Required Environment Variables
-
-You must set the following environment variables:
-
-- **MYSQL_ROOT_PASSWORD**: Your MySQL root password
 - **OPENAI_API_KEY**: Your OpenAI API key
 
 
@@ -29,6 +18,19 @@ Additionally, you should include these default environment variables in your `.e
 
 ```plaintext
 DB_USER=root
-DB_HOSTNAME=nasa-news-bot_mysql_1
-BACKEND_LOAD_BALANCER_URL=nasa-news-bot_backend_1:5000
+DB_HOSTNAME=mysql
+BACKEND_LOAD_BALANCER_URL=nasa-news-bot-backend-1:5000
 BACKEND_WEBSOCKET_URL=localhost:5000
+
+##Starting the application
+
+Firstly, ensure that Docker and docker compose are installed. For this to work docker compose v2 should be installed.
+(Optional) Then run the below command in the terminal:
+
+```make build```
+
+Once all the images have been built you can run all the containers using the below command. Alternatively, you can just run
+the below command without running `make build`. The command below should build images if they haven't been built already and then run the containers.
+
+```make start```
+
