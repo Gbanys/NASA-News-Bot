@@ -26,7 +26,7 @@ phases:
 
   post_build:
     commands:
-      - docker tag docker.io/library/src_frontend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
+      - docker tag docker.io/library/src-frontend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
       - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
-      - docker tag docker.io/library/src_backend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
+      - docker tag docker.io/library/src-backend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
       - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
