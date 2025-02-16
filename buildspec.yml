@@ -30,3 +30,5 @@ phases:
       - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_frontend:latest
       - docker tag docker.io/library/src-backend:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
       - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_backend:latest
+      - docker tag docker.io/library/src-sync:latest 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_sync:latest
+      - docker push 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_sync:latest
