@@ -146,3 +146,7 @@ async def get_answers_by_answer_id_in_database(answer_id: int):
 
 async def add_feedback(answer_id: int, feedback: str) -> None:
     add_feedback_to_answer(answer_id, feedback)
+
+@app.get("/health")
+def health_check() -> dict[str, str]:
+    return {"status": "ok"}
