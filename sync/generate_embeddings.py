@@ -2,12 +2,21 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
-from langchain.vectorstores import Qdrant
-import qdrant_client
 import os
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
 from web_scrape_pages import extract_all_links
+import boto3
+from typing import Any
+
+ssm_client = boto3.client('ssm', region_name='eu-west-2')
+def get_parameter(param_name, with_decryption=True) -> Any:
+    response = ssm_client.get_parameter(
+        Name=param_name,
+        WithDecryption=with_decryption
+    )
+    return response['Parameter']['Value']
+
+if os.environ["ENVIRONMENT"] == "PRODUCTION":
+    os.environ["OPENAI_API_KEY"] = get_parameter('/nasa_chatbot/openai_api_key')
 
 def generate_embeddings() -> None:
     links = extract_all_links(number_of_pages=5)
