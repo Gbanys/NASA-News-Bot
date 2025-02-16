@@ -40,6 +40,11 @@ You may choose to use the snapshot file that is provided and then run this comma
 
 IN PRODUCTION:
 
+Create a storage class by getting the FileSystemID from Amazon EFS. The EFS storage will be mounted to the pods
+in the Kubernetes cluster. The file for creating the storage class object is called "efs-storage-class.yaml"
+
+Deploy a persistent volume claim object which is defined in a template yaml file called "qdrant-snapshot-restoration-pvc.yaml"
+
 Use this command to restore to MySQL database:
 
-```cat schema.sql | kubectl exec -i mysql-release-0 -- mysql -u root -p$MYSQL_ROOT_PASSWORD```
+```cat schema.sql | kubectl exec -i mysql-primary-0 -- mysql -u root -p$MYSQL_ROOT_PASSWORD```

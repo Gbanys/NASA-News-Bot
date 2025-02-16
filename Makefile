@@ -1,5 +1,5 @@
 .PHONY: restore-snapshot
-SNAPSHOT_NAME=backend/nasa_web_pages.snapshot
+SNAPSHOT_NAME=sync/nasa_web_pages.snapshot
 QDRANT_URL=http://localhost:6333
 
 build:

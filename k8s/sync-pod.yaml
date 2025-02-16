@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sync
+spec:
+  containers:
+  - name: sync
+    image: 257743355435.dkr.ecr.eu-west-2.amazonaws.com/nasa_sync:latest
+    command: ["sleep","7200"]
+    envFrom:
+    - secretRef:
+        name: sync-secret
+

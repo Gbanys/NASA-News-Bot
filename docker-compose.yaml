@@ -67,4 +67,5 @@ services:
     environment:
       - OPENAI_API_KEY
       - QDRANT_HOST
+      - SNAPSHOT_NAME
       - ENVIRONMENT
