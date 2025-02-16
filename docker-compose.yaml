@@ -57,3 +57,13 @@ services:
       - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD
+
+  sync:
+    build:
+      context: .
+      dockerfile: sync/Dockerfile
+    volumes:
+      - ./sync:/app/sync
+    environment:
+      - OPENAI_API_KEY
+      - QDRANT_HOST

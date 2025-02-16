@@ -37,3 +37,9 @@ Finally, once all containers are running, ensure that the qdrant vectorstore is 
 You may choose to use the snapshot file that is provided and then run this command:
 
 ```make restore-snapshot```
+
+IN PRODUCTION:
+
+Use this command to restore to MySQL database:
+
+```cat schema.sql | kubectl exec -i mysql-release-0 -- mysql -u root -p$MYSQL_ROOT_PASSWORD```

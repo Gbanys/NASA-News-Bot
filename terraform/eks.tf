@@ -33,6 +33,21 @@ module "eks" {
     ami_type = "AL2_x86_64"
   }
 
+  cluster_addons = {
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
+    aws-efs-csi-driver = {
+      most_recent = true
+    }
+  }
+
   eks_managed_node_groups = {
     one = {
       name = "node-group-1"
@@ -42,6 +57,26 @@ module "eks" {
       min_size     = 1
       max_size     = 3
       desired_size = 2
+
+      iam_role_additional_policies = {
+        AmazonEFSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
+        SSMGetParameterPolicy    = aws_iam_policy.ssm_get_parameter_policy.arn
+      }
     }
   }
+}
+
+resource "aws_iam_policy" "ssm_get_parameter_policy" {
+  name        = "nasa-backend-ssm-get-parameter-policy"
+  description = "Allows ssm:GetParameter for nasa_chatbot openai api key"
+  policy      = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = "ssm:GetParameter",
+        Effect   = "Allow",
+        Resource = "arn:aws:ssm:eu-west-2:257743355435:parameter/nasa_chatbot/openai_api_key"
+      }
+    ]
+  })
 }
